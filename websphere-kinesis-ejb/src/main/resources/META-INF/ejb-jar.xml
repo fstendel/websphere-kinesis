@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<ejb-jar
+        xmlns="http://java.sun.com/xml/ns/javaee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd"
+        version="3.1"
+>
+    <display-name>KinesisStreamProcessingExample</display-name>
+
+    <enterprise-beans>
+        <session>
+            <ejb-name>KinesisStreamListener</ejb-name>
+            <ejb-class>de.florianstendel.apps.KinesisListener</ejb-class>
+            <session-type>Singleton</session-type>
+            <init-on-startup>true</init-on-startup>
+        </session>
+    </enterprise-beans>
+</ejb-jar>

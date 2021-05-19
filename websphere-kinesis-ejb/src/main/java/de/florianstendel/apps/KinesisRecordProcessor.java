@@ -3,6 +3,7 @@ package de.florianstendel.apps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.kinesis.exceptions.InvalidStateException;
 import software.amazon.kinesis.exceptions.ShutdownException;
 import software.amazon.kinesis.lifecycle.events.*;
@@ -37,9 +38,9 @@ public class KinesisRecordProcessor implements ShardRecordProcessor {
             System.out.println("Processing "+ processRecordsInput.records().size() + " records.");
             System.out.println("Records contents:");
             for(KinesisClientRecord kinesisClientRecord : processRecordsInput.records()) {
-                byte[] dataSet = new byte[kinesisClientRecord.data().remaining()];
-                kinesisClientRecord.data().duplicate().get(dataSet);
-                System.out.println("Datensatz: "+ new String(dataSet));
+
+                SdkBytes data = SdkBytes.fromByteBuffer(kinesisClientRecord.data());
+                System.out.println("Datensatz: "+ data.asUtf8String());
             }
 
             log.info("Processing {} record(s)", processRecordsInput.records().size());

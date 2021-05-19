@@ -24,7 +24,6 @@ public class KinesisRecordProcessor implements ShardRecordProcessor {
         shardId = initializationInput.shardId();
         MDC.put(SHARD_ID_MDC_KEY, shardId);
         try {
-            System.out.println("Initializing @ Sequence: "+initializationInput.extendedSequenceNumber());
             log.info("Initializing @ Sequence: {}", initializationInput.extendedSequenceNumber());
         } finally {
             MDC.remove(SHARD_ID_MDC_KEY);
@@ -35,19 +34,15 @@ public class KinesisRecordProcessor implements ShardRecordProcessor {
     public void processRecords(ProcessRecordsInput processRecordsInput) {
         MDC.put(SHARD_ID_MDC_KEY, shardId);
         try {
-            System.out.println("Processing "+ processRecordsInput.records().size() + " records.");
-            System.out.println("Records contents:");
             for(KinesisClientRecord kinesisClientRecord : processRecordsInput.records()) {
 
                 SdkBytes data = SdkBytes.fromByteBuffer(kinesisClientRecord.data());
-                System.out.println("Datensatz: "+ data.asUtf8String());
+                log.info("Record received with content: "+ data.asUtf8String());
             }
 
             log.info("Processing {} record(s)", processRecordsInput.records().size());
             processRecordsInput.records().forEach(r -> log.info("Processing record pk: {} -- Seq: {}", r.partitionKey(), r.sequenceNumber()));
         } catch (Throwable t) {
-
-            System.out.println("Throwable records. Aborting.");
             log.error("Caught throwable while processing records. Aborting.");
             Runtime.getRuntime().halt(1);
         } finally {
@@ -59,7 +54,6 @@ public class KinesisRecordProcessor implements ShardRecordProcessor {
     public void leaseLost(LeaseLostInput leaseLostInput) {
         MDC.put(SHARD_ID_MDC_KEY, shardId);
         try {
-            System.out.println("Lost lease");
             log.info("Lost lease, so terminating.");
         } finally {
             MDC.remove(SHARD_ID_MDC_KEY);
@@ -70,7 +64,6 @@ public class KinesisRecordProcessor implements ShardRecordProcessor {
     public void shardEnded(ShardEndedInput shardEndedInput) {
         MDC.put(SHARD_ID_MDC_KEY, shardId);
         try {
-            System.out.println("Shard end checkpointing");
             log.info("Reached shard end checkpointing.");
             shardEndedInput.checkpointer().checkpoint();
         } catch (ShutdownException | InvalidStateException e) {

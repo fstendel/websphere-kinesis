@@ -1,4 +1,4 @@
-package de.florianstendel.apps;
+package de.florianstendel.apps.kinesis.consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,14 +34,13 @@ public class KinesisRecordProcessor implements ShardRecordProcessor {
     public void processRecords(ProcessRecordsInput processRecordsInput) {
         MDC.put(SHARD_ID_MDC_KEY, shardId);
         try {
-            for(KinesisClientRecord kinesisClientRecord : processRecordsInput.records()) {
-
-                SdkBytes data = SdkBytes.fromByteBuffer(kinesisClientRecord.data());
-                log.info("Record received with content: "+ data.asUtf8String());
-            }
-
             log.info("Processing {} record(s)", processRecordsInput.records().size());
-            processRecordsInput.records().forEach(r -> log.info("Processing record pk: {} -- Seq: {}", r.partitionKey(), r.sequenceNumber()));
+            processRecordsInput.records()
+                    .forEach(r -> {
+                        log.info("Processing record pk: {} -- Seq: {}", r.partitionKey(), r.sequenceNumber());
+                        SdkBytes data = SdkBytes.fromByteBuffer(r.data());
+                        log.info("Record content is: " + data.asUtf8String());
+                    });
         } catch (Throwable t) {
             log.error("Caught throwable while processing records. Aborting.");
             Runtime.getRuntime().halt(1);

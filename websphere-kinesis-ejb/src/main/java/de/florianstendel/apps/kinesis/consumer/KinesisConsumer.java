@@ -1,4 +1,4 @@
-package de.florianstendel.apps;
+package de.florianstendel.apps.kinesis.consumer;
 
 
 import org.slf4j.Logger;
@@ -20,11 +20,12 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.concurrent.ManagedThreadFactory;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import java.net.URI;
 import java.time.Duration;
 import java.util.UUID;
 
-public class KinesisListener {
+public class KinesisConsumer {
 
     private static final String APPLICATION_NAME = "CoolKinesisConsumer";
     private static final String STREAM_NAME = "Cool-Stream";
@@ -35,7 +36,7 @@ public class KinesisListener {
     private Scheduler scheduler = null;
 
 
-    private static final Logger log = LoggerFactory.getLogger(KinesisListener.class);
+    private static final Logger log = LoggerFactory.getLogger(KinesisConsumer.class);
 
     @PostConstruct
     public void startup() {
@@ -77,21 +78,26 @@ public class KinesisListener {
 
             log.info("Start consuming from stream: " + STREAM_NAME);
 
-            ManagedThreadFactory managedThreadFactory =
-                    (ManagedThreadFactory) new InitialContext().lookup(
-                            "java:comp/DefaultManagedThreadFactory");
-
-            schedulerThread = managedThreadFactory.newThread(scheduler);
-
-            schedulerThread.setDaemon(true);
-            schedulerThread.start();
-
-            log.info("Kinesis Scheduler Thread started:" + schedulerThread.getName());
+            start();
 
 
         } catch (Throwable t) {
             log.error("Exited kinesis consumer");
         }
+    }
+
+    private void start() throws NamingException {
+
+        ManagedThreadFactory managedThreadFactory =
+                (ManagedThreadFactory) new InitialContext().lookup(
+                        "java:comp/DefaultManagedThreadFactory");
+
+        Thread schedulerThread = managedThreadFactory.newThread(scheduler);
+
+        schedulerThread.setDaemon(true);
+        schedulerThread.start();
+
+        log.info("Kinesis Scheduler Thread started:" + schedulerThread.getName());
     }
 
 

@@ -1,4 +1,4 @@
-package de.florianstendel.apps;
+package de.florianstendel.apps.kinesis.consumer;
 
 import software.amazon.kinesis.processor.ShardRecordProcessor;
 import software.amazon.kinesis.processor.ShardRecordProcessorFactory;

@@ -1,5 +1,6 @@
-package de.florianstendel.apps.kinesis.consumer;
+package de.florianstendel.apps.kinesis.interfaces.consumer;
 
+import de.florianstendel.apps.kinesis.business.BusinessLogicProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -8,16 +9,37 @@ import software.amazon.kinesis.exceptions.InvalidStateException;
 import software.amazon.kinesis.exceptions.ShutdownException;
 import software.amazon.kinesis.lifecycle.events.*;
 import software.amazon.kinesis.processor.ShardRecordProcessor;
-import software.amazon.kinesis.retrieval.KinesisClientRecord;
 
-public class KinesisRecordProcessor implements ShardRecordProcessor {
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+public class KinesisDataRecordProcessor implements ShardRecordProcessor {
 
 
     private static final String SHARD_ID_MDC_KEY = "ShardId";
 
-    private static final Logger log = LoggerFactory.getLogger(KinesisRecordProcessor.class);
+    private static final Logger log = LoggerFactory.getLogger(KinesisDataRecordProcessor.class);
+
+    private BusinessLogicProcessor businessLogicProcessor;
 
     private String shardId;
+
+
+    /**
+     * Create an instance of @{@link KinesisDataRecordProcessor} and injects/lookups
+     * and instance of @{@link BusinessLogicProcessor}
+     * as this class is initiated/used by a non EJB-container-managed framework (AWS KCL/KPL)
+     *
+     */
+    public KinesisDataRecordProcessor() {
+        try {
+            businessLogicProcessor = (BusinessLogicProcessor)
+                        new InitialContext().lookup("java:module/BusinessLogicProcessor");
+        } catch (NamingException e) {
+            throw new IllegalStateException("BusinessLogicProcess could not be retrieved from EjbContainer",e);
+        }
+    }
+
 
     @Override
     public void initialize(InitializationInput initializationInput) {
@@ -40,6 +62,8 @@ public class KinesisRecordProcessor implements ShardRecordProcessor {
                         log.info("Processing record pk: {} -- Seq: {}", r.partitionKey(), r.sequenceNumber());
                         SdkBytes data = SdkBytes.fromByteBuffer(r.data());
                         log.info("Record content is: " + data.asUtf8String());
+                        businessLogicProcessor.processData(data.asUtf8String());
+
                     });
         } catch (Throwable t) {
             log.error("Caught throwable while processing records. Aborting.");

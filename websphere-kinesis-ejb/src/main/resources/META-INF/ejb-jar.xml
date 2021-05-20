@@ -9,10 +9,22 @@
 
     <enterprise-beans>
         <session>
-            <ejb-name>KinesisStreamListener</ejb-name>
-            <ejb-class>de.florianstendel.apps.kinesis.consumer.KinesisConsumer</ejb-class>
+            <ejb-name>KinesisDataConsumer</ejb-name>
+            <ejb-class>de.florianstendel.apps.kinesis.interfaces.consumer.KinesisDataConsumer</ejb-class>
             <session-type>Singleton</session-type>
             <init-on-startup>true</init-on-startup>
+        </session>
+
+        <session>
+            <ejb-name>KinesisDataProducer</ejb-name>
+            <ejb-class>de.florianstendel.apps.kinesis.interfaces.producer.KinesisDataProducer</ejb-class>
+            <session-type>Singleton</session-type>
+        </session>
+
+        <session>
+            <ejb-name>BusinessLogicProcessor</ejb-name>
+            <ejb-class>de.florianstendel.apps.kinesis.business.BusinessLogicProcessor</ejb-class>
+            <session-type>Singleton</session-type>
         </session>
     </enterprise-beans>
 </ejb-jar>

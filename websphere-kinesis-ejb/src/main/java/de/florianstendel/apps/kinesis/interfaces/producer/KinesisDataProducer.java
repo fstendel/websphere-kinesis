@@ -9,16 +9,19 @@ import software.amazon.awssdk.services.kinesis.KinesisAsyncClient;
 import software.amazon.awssdk.services.kinesis.model.PutRecordRequest;
 import software.amazon.kinesis.common.KinesisClientUtil;
 
+import javax.ejb.Local;
+import javax.ejb.Singleton;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+@Singleton
 public class KinesisDataProducer {
 
     private static final String STREAM_NAME = StreamsConfiguration.getOutboundStreamName();
     private static final Region region = StreamsConfiguration.getRegion();
     private static final String KINESIS_URL = StreamsConfiguration.getKinesisUrl();
 
-    public void startup(final String data) throws URISyntaxException {
+    public void push(final String data) throws URISyntaxException {
 
         KinesisAsyncClient kinesisAsyncClient = KinesisClientUtil.createKinesisAsyncClient(
                 KinesisAsyncClient.builder()

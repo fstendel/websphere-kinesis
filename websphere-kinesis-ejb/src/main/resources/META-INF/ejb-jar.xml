@@ -7,7 +7,7 @@
 >
     <display-name>KinesisStreamProcessingExample</display-name>
 
-    <enterprise-beans>
+    <!--enterprise-beans>
         <session>
             <ejb-name>KinesisDataConsumer</ejb-name>
             <ejb-class>de.florianstendel.apps.kinesis.interfaces.consumer.KinesisDataConsumer</ejb-class>
@@ -26,5 +26,5 @@
             <ejb-class>de.florianstendel.apps.kinesis.business.BusinessLogicProcessor</ejb-class>
             <session-type>Singleton</session-type>
         </session>
-    </enterprise-beans>
+    </enterprise-beans-->
 </ejb-jar>

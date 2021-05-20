@@ -5,7 +5,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ejb.EJB;
+import javax.ejb.Local;
+import javax.ejb.Singleton;
 
+@Singleton
 public class BusinessLogicProcessor {
 
 
@@ -21,7 +24,7 @@ public class BusinessLogicProcessor {
         log.info("Doing highly sophisticated processing here...");
         try {
             String processedData = data + " extended with additional processing information.";
-            kinesisDataProducer.startup(processedData);
+            kinesisDataProducer.push(processedData);
         } catch (Throwable e) {
             log.error("Error pushing data back to kinesis",e);
         }

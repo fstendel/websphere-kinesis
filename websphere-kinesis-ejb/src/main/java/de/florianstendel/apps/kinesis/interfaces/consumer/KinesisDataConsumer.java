@@ -19,6 +19,9 @@ import software.amazon.kinesis.retrieval.polling.PollingConfig;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.ejb.Local;
+import javax.ejb.Singleton;
+import javax.ejb.Startup;
 import javax.enterprise.concurrent.ManagedThreadFactory;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -27,6 +30,8 @@ import java.net.URISyntaxException;
 import java.time.Duration;
 import java.util.UUID;
 
+@Startup
+@Singleton
 public class KinesisDataConsumer {
 
     private static final String APPLICATION_NAME = StreamsConfiguration.getApplicationName();

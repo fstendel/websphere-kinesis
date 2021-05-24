@@ -1,0 +1,45 @@
+
+---
+version: '3.4'
+
+
+services:
+
+  kinesis:
+    container_name: websphere-kinesis-localstack
+    image: localstack/localstack
+    ports:
+      - 4566:4566
+    environment:
+      EDGE_PORT: 4566
+      SERVICES: kinesis,cloudwatch,dynamodb
+      DEFAULT_REGION: eu-central-1
+      HOSTNAME: kinesis
+      HOSTNAME_EXTERNAL: kinesis
+
+  database:
+    container_name: websphere-kinesis-database
+    image: mysql:8
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+    volumes:
+      - "./database/init-script.sql:/docker-entrypoint-initdb.d/1-init-script.sql"
+
+  kinesis-init-streams:
+    container_name: websphere-kinesis-init-streams
+    image: garland/aws-cli-docker
+    depends_on:
+      - kinesis
+    environment:
+      AWS_ACCESS_KEY_ID: localstackIgnoresThis
+      AWS_SECRET_ACCESS_KEY: localstackIgnoresThis
+      AWS_DEFAULT_REGION: eu-central-1
+    restart: on-failure
+    healthcheck:
+      start_period: 30s
+    command: >
+      sh -c "aws --endpoint-url http://kinesis:4566/ kinesis create-stream --shard-count 1 --stream-name OrderIngests && \
+         aws --endpoint-url http://kinesis:4566/ kinesis create-stream --shard-count 1 --stream-name OrderNotifications"

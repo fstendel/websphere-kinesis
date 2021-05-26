@@ -44,11 +44,15 @@
         <fileset dir="/jdbc" include="*.jar"/>
     </library>
 
+
     <dataSource id="myDatasource" jndiName="jdbc/myDataSource">
+
         <jdbcDriver libraryRef="JdbcLib"/>
         <connectionManager maxPoolSize="10" minPoolSize="2"/>
         <properties databaseName="${database.name}"
                     serverName="${database.host}"
-                    portNumber="${database.port}"/>
+                    portNumber="${database.port}"
+                    user="${database.user}"
+                    password="${database.password}"/>
     </dataSource>
 </server>
